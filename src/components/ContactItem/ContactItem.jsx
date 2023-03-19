@@ -1,16 +1,14 @@
 import PropTypes from 'prop-types';
 import { Item, NameItem, Button} from './ContactItem.styled';
 
-export function ContactItem({ contact: { name, number }, deleteContact }) {
+export function ContactItem({ contact, deleteContact }) {
   return (
     <Item>
       <NameItem>
-        <p>{name}
-        </p>
-        <p>{number}
-        </p>
+        <p>{contact.name}</p>
+        <p>{contact.number}</p>
       </NameItem>
-      <Button type="button" onClick={deleteContact}>
+      <Button type="button" onClick={() => deleteContact(contact.id)}>
         Delete
       </Button>
     </Item>

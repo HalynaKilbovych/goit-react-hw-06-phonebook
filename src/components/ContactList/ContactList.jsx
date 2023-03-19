@@ -1,9 +1,18 @@
 import PropTypes from 'prop-types';
 import { ContactItem } from 'components/ContactItem/ContactItem';
 import { ContactWrapper } from './ContactList.styled';
+import { deleteContact, getContacts } from '../redux/contactSlice';
+import { useDispatch, useSelector } from 'react-redux';
 
-export function ContactList({ contacts, deleteContact }) {
-    return (
+export function ContactList() {
+  const dispatch = useDispatch();
+  const contacts = useSelector(getContacts);
+
+  const handleDeleteContact = id => {
+    dispatch(deleteContact(id));
+  };
+
+  return (
     <ContactWrapper>
       <ul>
         {contacts.length ? (
@@ -11,22 +20,17 @@ export function ContactList({ contacts, deleteContact }) {
             <ContactItem
               key={contact.id}
               contact={contact}
-              deleteContact={() => deleteContact(contact.id)}
+              deleteContact={() => handleDeleteContact(contact.id)}
             />
           ))
         ) : (
-        <p>There are no contacts yet.</p>
+          <p>There are no contacts yet.</p>
         )}
       </ul>
-      </ContactWrapper>
-    );
-  }
-  
-  ContactList.propTypes = {
-    contacts: PropTypes.arrayOf(
-      PropTypes.shape({
-        id: PropTypes.string.isRequired,
-      })
-    ).isRequired,
-    deleteContact: PropTypes.func.isRequired,
-  };
+    </ContactWrapper>
+  );
+}
+
+ContactList.propTypes = {
+  deleteContact: PropTypes.func.isRequired,
+};

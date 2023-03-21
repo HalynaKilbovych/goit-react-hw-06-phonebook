@@ -1,19 +1,22 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import { FilterWrapper, Label, Input } from './Filter.styled';
+import { useSelector, useDispatch } from 'react-redux';
+import { getFilterValue, setFilterValue } from 'components/redux/filterSlice';
 
-export function Filter({ value, onChange }) {
+
+export function Filter() {
+  const dispatch = useDispatch();
+  const filterValue = useSelector(getFilterValue);
+
+  const onChange = e => {
+    dispatch(setFilterValue(e.currentTarget.value));
+  };
   return (
   <FilterWrapper>
     <Label>
       Find name
-      <Input type="text" value={value} onChange={onChange} placeholder=" " />
+      <Input type="text" value={filterValue} onChange={onChange} placeholder=" " />
     </Label>
   </FilterWrapper>
   );
 }
-
-Filter.propTypes = {
-  value: PropTypes.string.isRequired,
-  onChange: PropTypes.func.isRequired,
-};

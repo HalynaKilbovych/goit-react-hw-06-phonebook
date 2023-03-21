@@ -1,36 +1,38 @@
-import PropTypes from 'prop-types';
-import { ContactItem } from 'components/ContactItem/ContactItem';
-import { ContactWrapper } from './ContactList.styled';
-import { deleteContact, getContacts } from '../redux/contactSlice';
-import { useDispatch, useSelector } from 'react-redux';
+import { List, Item, DeleteButton } from './ContactList.styled';
+import { useSelector, useDispatch } from 'react-redux';
+import { deleteContact, getContacts } from 'components/redux/contactSlice';
+import { getFilterValue } from 'components/redux/filterSlice';
 
-export function ContactList() {
+export const ContactList = () => {
   const dispatch = useDispatch();
   const contacts = useSelector(getContacts);
+  const filter = useSelector(getFilterValue);
 
-  const handleDeleteContact = id => {
-    dispatch(deleteContact(id));
+  const filteredContacts = () => {
+    const normalizedFilter = filter.toLowerCase();
+    return contacts.filter(contact =>
+      contact.name.toLowerCase().includes(normalizedFilter)
+    );
   };
 
-  return (
-    <ContactWrapper>
-      <ul>
-        {contacts.length ? (
-          contacts.map(contact => (
-            <ContactItem
-              key={contact.id}
-              contact={contact}
-              deleteContact={() => handleDeleteContact(contact.id)}
-            />
-          ))
-        ) : (
-          <p>There are no contacts yet.</p>
-        )}
-      </ul>
-    </ContactWrapper>
-  );
-}
+  const contactsToDisplay = filteredContacts();
 
-ContactList.propTypes = {
-  deleteContact: PropTypes.func.isRequired,
+  return (
+    <List>
+      {contactsToDisplay.length === 0 && !filter && (
+        <p>No contacts here</p>
+      )}
+      {contactsToDisplay.length === 0 && filter && (
+        <p>No contacts found</p>
+      )}
+      {contactsToDisplay.map(({ id, name, number }) => (
+        <Item key={id}>
+          {name}: {number}
+          <DeleteButton type="button" onClick={() => dispatch(deleteContact(id))}>
+            Delete
+          </DeleteButton>
+        </Item>
+      ))}
+    </List>
+  );
 };

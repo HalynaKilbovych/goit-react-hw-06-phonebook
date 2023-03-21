@@ -1,37 +1,55 @@
 import React, { useState } from 'react';
 import { nanoid } from "nanoid";
 import { Form, Label, Input, Button } from "./ContactForm.styled";
-import { useDispatch } from 'react-redux';
-import { addContact } from 'components/redux/contactSlice';
-
+import { useDispatch, useSelector } from 'react-redux';
+import { addContact, getContacts } from 'components/redux/contactSlice';
 
 export const ContactForm = () => {
-  const dispatch = useDispatch();
-
   const [name, setName] = useState('');
   const [number, setNumber] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
+
+  const dispatch = useDispatch();
+  const contacts = useSelector(getContacts);
 
   const handleChange = e => {
     const { name, value } = e.target;
-    name === 'name' ? setName(value) : setNumber(value);
+    switch (name) {
+      case 'name':
+        setName(value);
+        break;
+      case 'number':
+        setNumber(value);
+        break;
+      default:
+        return;
+    }
   };
 
   const handleSubmitForm = e => {
     e.preventDefault();
+    if (
+      contacts.find(
+        contact => contact.name.toLowerCase() === name.toLowerCase()
+      )
+    ) {
+      setErrorMessage('OOPs..Contact already exists');
+      return;
+    } else {
+      dispatch(addContact({ id: nanoid(4), name, number }));
+      resetForm();
+    }
+  };
 
-    const newContact = {
-      id: nanoid(),
-      name: name,
-      number: number,
-    };
-
-    dispatch(addContact(newContact));
+  const resetForm = () => {
     setName('');
     setNumber('');
+    setErrorMessage('');
   };
 
   return (
     <Form onSubmit={handleSubmitForm}>
+      {errorMessage && <p>{errorMessage}</p>}
       <Label>
         Name
         <Input
